@@ -15,6 +15,11 @@ jobs:
       (github.event_name == 'push' && contains(github.event.head_commit.message, 'tests:run'))
     runs-on: ubuntu-latest
     steps:
+      - run:
+          echo "PR_NUMBER=${{ github.event.issue.number }}" >> $GITHUB_ENV
+
+      - uses: Warpbuilds/action-debugger@v1.3
+
       - name: Set PR info for comment triggers
         run: |
           PR_NUMBER="${{ github.event.issue.number }}"
@@ -27,8 +32,6 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - uses: Warpbuilds/action-debugger@v1.3
 
       - name: Roll
         run:
