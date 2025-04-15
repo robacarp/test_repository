@@ -2,11 +2,7 @@ name: CI
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+    branches: "**"
   workflow_dispatch:
   issue_comment:
     types: [created, edited]
@@ -23,6 +19,8 @@ jobs:
         uses: actions/checkout@v4
       - name: Roll
         run:
+          #!/usr/bin/env bash
+          set -e
           echo "Rolling a d6!"
           roll=(( ( RANDOM % 6 ) + 1 ))
           echo "You rolled a $roll"
