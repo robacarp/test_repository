@@ -21,22 +21,24 @@ jobs:
       - run:
           echo "PR_NUMBER=${{ github.event.issue.number }}" >> $GITHUB_ENV
 
-      - uses: Warpbuilds/action-debugger@v1.3
+      # - uses: Warpbuilds/action-debugger@v1.3
 
-      # On a psh event, this env var exists: GITHUB_REF
+      # On a push event, this env var exists: GITHUB_REF
       # On a comment event, GITHUB_REF points to main
       - name: Set PR info for comment triggers
         run: |
-          PR_NUMBER="${{ github.event.issue.number }}"
-          echo "$PR_NUMBER"
-          PR_SHA=$(gh pr view $PR_NUMBER --json headRefOid -q .headRefOid)
-          echo "$PR_SHA"
-          git checkout $PR_SHA
+          if [[ "${{ github.event_name }}" == "issue_comment" ]]; then
+            echo "TARGET_REF=$(gh pr view $PR_NUMBER --json headRefOid -q .headRefOid)" >> $GITHUB_ENV
+          else
+            echo "TARGET_REF=${GITHUB_REF}" >> $GITHUB_ENV
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TARGET_REF }}
 
       - name: Roll
         run:
