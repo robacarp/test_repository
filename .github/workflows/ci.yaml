@@ -15,8 +15,21 @@ jobs:
       (github.event_name == 'push' && contains(github.event.head_commit.message, 'tests:run'))
     runs-on: ubuntu-latest
     steps:
+      - name: Set PR info for comment triggers
+        run: |
+          PR_NUMBER="${{ github.event.issue.number }}"
+          echo "$PR_NUMBER"
+          PR_SHA=$(gh pr view $PR_NUMBER --json headRefOid -q .headRefOid)
+          echo "$PR_SHA"
+          git checkout $PR_SHA
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - uses: Warpbuilds/action-debugger@v1.3
+
       - name: Roll
         run:
           #!/usr/bin/env bash
