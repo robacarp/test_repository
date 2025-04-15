@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+  issue_comment:
+    types: [created, edited]
+
+jobs:
+  ci:
+    name: CI
+    if: >-
+      (github.event.issue.pull_request && contains(github.event.comment.body, 'tests:run')) ||
+      (github.event_name == 'push' && contains(github.event.head_commit.message, 'tests:run'))
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Roll
+        run:
+          echo "Rolling a d6!"
+          roll=(( ( RANDOM % 6 ) + 1 ))
+          echo "You rolled a $roll"
+          if [ $roll -eq 1 ]; then
+            echo "You win!"
+            exit 0
+          else
+            echo "You lose!"
+            exit 1
+          fi
