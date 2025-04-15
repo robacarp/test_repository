@@ -14,12 +14,17 @@ jobs:
       (github.event.issue.pull_request && contains(github.event.comment.body, 'tests:run')) ||
       (github.event_name == 'push' && contains(github.event.head_commit.message, 'tests:run'))
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+
     steps:
       - run:
           echo "PR_NUMBER=${{ github.event.issue.number }}" >> $GITHUB_ENV
 
       - uses: Warpbuilds/action-debugger@v1.3
 
+      # On a psh event, this env var exists: GITHUB_REF
+      # On a comment event, GITHUB_REF points to main
       - name: Set PR info for comment triggers
         run: |
           PR_NUMBER="${{ github.event.issue.number }}"
